@@ -56,9 +56,7 @@ export default function TerminalClient({ wsUrl }: { wsUrl: string }) {
   }, [wsUrl]);
 
   async function handleCopy() {
-    const term = termRef.current;
-    if (!term) return;
-    const selection = term.getSelection();
+    const selection = window.getSelection()?.toString() || termRef.current?.getSelection() || "";
     if (selection) {
       await navigator.clipboard.writeText(selection);
       setCopied(true);
