@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import TerminalClient from "./TerminalClient";
 
 export default async function TerminalPage() {
   const cookieStore = await cookies();
@@ -9,5 +10,5 @@ export default async function TerminalPage() {
     redirect("/");
   }
 
-  redirect("https://izzy-vnic.hutasoit.com");
+  return <TerminalClient wsUrl="wss://izzy-vnic.hutasoit.com" />;
 }
