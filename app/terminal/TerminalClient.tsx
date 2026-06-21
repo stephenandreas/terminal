@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 
 export default function TerminalClient({ wsUrl }: { wsUrl: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const termRef = useRef<Terminal | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const term = new Terminal({
@@ -19,8 +22,10 @@ export default function TerminalClient({ wsUrl }: { wsUrl: string }) {
     term.loadAddon(fit);
     term.open(containerRef.current!);
     fit.fit();
+    termRef.current = term;
 
     const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
 
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: "resize", cols: term.cols, rows: term.rows }));
@@ -50,16 +55,48 @@ export default function TerminalClient({ wsUrl }: { wsUrl: string }) {
     };
   }, [wsUrl]);
 
+  async function handleCopy() {
+    const term = termRef.current;
+    if (!term) return;
+    const selection = term.getSelection();
+    if (selection) {
+      await navigator.clipboard.writeText(selection);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  }
+
+  async function handlePaste() {
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    const text = await navigator.clipboard.readText();
+    ws.send(JSON.stringify({ type: "input", data: text }));
+  }
+
   return (
     <main className="min-h-screen bg-zinc-950 flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 shrink-0">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-white text-sm font-medium">⌘ Terminal</span>
           <span className="text-zinc-500 text-xs">hutasoit.com</span>
         </div>
-        <a href="/api/logout" className="text-zinc-500 text-xs hover:text-zinc-300 transition-colors">
-          Sign out
-        </a>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleCopy}
+            className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
+          >
+            {copied ? "Copied!" : "Copy"}
+          </button>
+          <button
+            onClick={handlePaste}
+            className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
+          >
+            Paste
+          </button>
+          <a href="/api/logout" className="text-zinc-500 text-xs hover:text-zinc-300 transition-colors ml-2">
+            Sign out
+          </a>
+        </div>
       </div>
       <div ref={containerRef} className="flex-1 p-2" />
     </main>
