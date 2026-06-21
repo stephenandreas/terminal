@@ -9,25 +9,5 @@ export default async function TerminalPage() {
     redirect("/");
   }
 
-  return (
-    <main className="min-h-screen bg-zinc-950 flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-        <div className="flex items-center gap-2">
-          <span className="text-white text-sm font-medium">⌘ Terminal</span>
-          <span className="text-zinc-500 text-xs">hutasoit.com</span>
-        </div>
-        <a
-          href="/api/logout"
-          className="text-zinc-500 text-xs hover:text-zinc-300 transition-colors"
-        >
-          Sign out
-        </a>
-      </div>
-      <iframe
-        src="https://terminal.hutasoit.com"
-        className="flex-1 w-full border-0"
-        allow="clipboard-read; clipboard-write"
-      />
-    </main>
-  );
+  redirect("https://izzy-vnic.hutasoit.com");
 }
