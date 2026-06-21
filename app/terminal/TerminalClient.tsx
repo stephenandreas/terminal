@@ -83,13 +83,17 @@ export default function TerminalClient({ wsUrl }: { wsUrl: string }) {
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopy}
-            className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
+            className={`text-xs px-3 py-1.5 rounded-md transition-all duration-150 cursor-pointer select-none ${
+              copied
+                ? "bg-green-600 text-white scale-95"
+                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white active:scale-95"
+            }`}
           >
-            {copied ? "Copied!" : "Copy"}
+            {copied ? "✓ Copied!" : "Copy"}
           </button>
           <button
             onClick={handlePaste}
-            className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition-colors"
+            className="text-xs px-3 py-1.5 rounded-md bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white active:scale-95 active:bg-zinc-600 transition-all duration-150 cursor-pointer select-none"
           >
             Paste
           </button>
